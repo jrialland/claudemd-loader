@@ -71,9 +71,10 @@ jobs:
   publish:
     needs: build
     name: Publish to PyPI
-    environment:
-      name: pypi
-      url: https://pypi.org/p/claudemd-loader
+    # Note: environment removed for initial release - add back after configuring trusted publishing on PyPI
+    # environment:
+    #   name: pypi
+    #   url: https://pypi.org/p/claudemd-loader
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     runs-on: ubuntu-latest
