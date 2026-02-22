@@ -17,6 +17,7 @@ class ClaudeMdLoaderContext:
         self,
         project_dir: str | Path,
         claudemd_filename: str | None = None,
+        claudemd_dirname: str | None = None,
         max_recursion_depth: int = 5,
         use_memory: bool = True,
         caching: bool = True,
@@ -28,6 +29,7 @@ class ClaudeMdLoaderContext:
         Args:
             project_dir: Path to the project directory containing CLAUDE.md.
             claudemd_filename: Optional filename for the main file (default: "CLAUDE.md").
+            claudemd_dirname: Optional directory name for claude files (default: ".claude").
             max_recursion_depth: Maximum depth for imports (default: 5).
             use_memory: Whether to load MEMORY.md from ~/.claude/projects/<project>/memory/
                 (default: True). When enabled, loads first 200 lines.
@@ -44,6 +46,7 @@ class ClaudeMdLoaderContext:
             raise NotADirectoryError(msg)
         self.project_name = project_name if project_name is not None else self.project_dir.name
         self.claudemd_filename = claudemd_filename or "CLAUDE.md"
+        self.claudemd_dirname = claudemd_dirname or ".claude"
         self.use_memory = use_memory
         self.caching = caching
         self._path_stack: list[Path] = []
@@ -182,7 +185,7 @@ class ClaudeMdLoaderContext:
             if memory_content:
                 memory_path = (
                     Path.home()
-                    / ".claude"
+                    / self.claudemd_dirname
                     / "projects"
                     / self.project_name
                     / "memory"
@@ -253,10 +256,10 @@ class ClaudeMdLoaderContext:
         # 5. Project .claude rules (./.claude/rules/**/*.md)
         # 6. Local personal file (./CLAUDE.local.md)
         conventional_paths = [
-            Path.home() / ".claude" / self.claudemd_filename,
-            Path.home() / ".claude" / "projects" / self.project_name / self.claudemd_filename,
+            Path.home() / self.claudemd_dirname / self.claudemd_filename,
+            Path.home() / self.claudemd_dirname / "projects" / self.project_name / self.claudemd_filename,
             self.project_dir / self.claudemd_filename,
-            self.project_dir / ".claude" / self.claudemd_filename,
+            self.project_dir / self.claudemd_dirname / self.claudemd_filename,
         ]
 
         # Load conventional files
@@ -267,7 +270,7 @@ class ClaudeMdLoaderContext:
                     yield file_path, content
 
         # Load all .md files from .claude/rules/ recursively
-        rules_dir = self.project_dir / ".claude" / "rules"
+        rules_dir = self.project_dir / self.claudemd_dirname / "rules"
         if rules_dir.exists() and rules_dir.is_dir():
             # Find all .md files recursively and sort for consistent ordering
             rule_files = sorted(rules_dir.rglob("*.md"))
@@ -392,7 +395,7 @@ class ClaudeMdLoaderContext:
             First 200 lines of MEMORY.md if it exists, empty string otherwise.
         """
         memory_path = (
-            Path.home() / ".claude" / "projects" / self.project_name / "memory" / "MEMORY.md"
+            Path.home() / self.claudemd_dirname / "projects" / self.project_name / "memory" / "MEMORY.md"
         )
 
         if not memory_path.exists():
