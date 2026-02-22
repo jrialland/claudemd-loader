@@ -123,10 +123,7 @@ def main() -> None:
         print("\n" + "=" * 70)
         print("4. Loading for multiple files: API + Python utils")
         print("-" * 70)
-        result = ctx.load_claudemd(context_files=[
-            "src/api/handlers.py",
-            "src/utils/helpers.py"
-        ])
+        result = ctx.load_claudemd(context_files=["src/api/handlers.py", "src/utils/helpers.py"])
         print(result)
         print("\nNotice: Includes General + API + Python rules, skips Frontend (silently)")
 

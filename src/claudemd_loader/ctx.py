@@ -236,8 +236,7 @@ class ClaudeMdLoaderContext:
         return normalized_files
 
     def _iter_claudemd_files(  # noqa: PLR0912
-        self,
-        extra_claude_files: list[str | Path] | None = None
+        self, extra_claude_files: list[str | Path] | None = None
     ) -> Generator[tuple[Path, str], None, None]:
         """
         Iterate over all CLAUDE.md files in conventional locations and extra files.
@@ -257,7 +256,11 @@ class ClaudeMdLoaderContext:
         # 6. Local personal file (./CLAUDE.local.md)
         conventional_paths = [
             Path.home() / self.claudemd_dirname / self.claudemd_filename,
-            Path.home() / self.claudemd_dirname / "projects" / self.project_name / self.claudemd_filename,
+            Path.home()
+            / self.claudemd_dirname
+            / "projects"
+            / self.project_name
+            / self.claudemd_filename,
             self.project_dir / self.claudemd_filename,
             self.project_dir / self.claudemd_dirname / self.claudemd_filename,
         ]
@@ -395,7 +398,12 @@ class ClaudeMdLoaderContext:
             First 200 lines of MEMORY.md if it exists, empty string otherwise.
         """
         memory_path = (
-            Path.home() / self.claudemd_dirname / "projects" / self.project_name / "memory" / "MEMORY.md"
+            Path.home()
+            / self.claudemd_dirname
+            / "projects"
+            / self.project_name
+            / "memory"
+            / "MEMORY.md"
         )
 
         if not memory_path.exists():
@@ -498,9 +506,7 @@ class ClaudeMdLoaderContext:
                 try:
                     frontmatter = yaml.safe_load(parts[0][4:])  # Skip first '---\n'
                     remaining_content = (
-                        parts[1]
-                        if len(parts) == _FRONTMATTER_PARTS
-                        else "\n---\n".join(parts[1:])
+                        parts[1] if len(parts) == _FRONTMATTER_PARTS else "\n---\n".join(parts[1:])
                     )
                     return remaining_content, frontmatter
                 except yaml.YAMLError:
@@ -567,7 +573,7 @@ class ClaudeMdLoaderContext:
                     return True
                 # Try matching the next pattern part at various positions
                 for k in range(j, len(path_parts) + 1):
-                    if self._glob_match("/".join(path_parts[k:]), "/".join(parts[i+1:])):
+                    if self._glob_match("/".join(path_parts[k:]), "/".join(parts[i + 1 :])):
                         return True
                 return False
             if self._match_segment(path_parts[j] if j < len(path_parts) else "", parts[i]):
@@ -629,8 +635,9 @@ class ClaudeMdLoaderContext:
             start, end = match.span()
 
             # Check if this match is inside a code block
-            in_code_block = any(block_start <= start < block_end
-                              for block_start, block_end in code_blocks)
+            in_code_block = any(
+                block_start <= start < block_end for block_start, block_end in code_blocks
+            )
 
             if in_code_block:
                 # Keep the import as-is if it's in a code block

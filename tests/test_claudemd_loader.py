@@ -18,11 +18,11 @@ def temp_project(tmp_path: Path) -> Path:
 
 def write_file_with_mtime_update(file_path: Path, content: str) -> None:
     """Write text to a file and force modification time update for cache testing.
-    
+
     This ensures that the file's mtime changes even on systems with low timestamp
     granularity (e.g., 1-second resolution on some Linux filesystems), which is
     critical for cache invalidation tests.
-    
+
     Args:
         file_path: Path to the file to write
         content: Text content to write
@@ -140,7 +140,7 @@ def test_max_recursion_depth(temp_project: Path) -> None:
     for i in range(num_files):
         file_path = temp_project / f"file{i}.md"
         if i < num_files - 1:
-            file_path.write_text(f"Level {i}\n\n@file{i+1}.md")
+            file_path.write_text(f"Level {i}\n\n@file{i + 1}.md")
         else:
             file_path.write_text(f"Level {i}")
 
@@ -315,7 +315,7 @@ def test_custom_max_recursion_depth(temp_project: Path) -> None:
     for i in range(num_files):
         file_path = temp_project / f"file{i}.md"
         if i < num_files - 1:
-            file_path.write_text(f"Level {i}\n\n@file{i+1}.md")
+            file_path.write_text(f"Level {i}\n\n@file{i + 1}.md")
         else:
             file_path.write_text(f"Level {i}")
 
@@ -1202,9 +1202,7 @@ def test_caching_different_context_files(temp_project: Path) -> None:
     """Test that different context_files result in different cache entries."""
     # Create CLAUDE.md with frontmatter
     claude_md = temp_project / "CLAUDE.md"
-    claude_md.write_text(
-        "---\ncontext_files:\n  - src/**/*.py\n---\n\n# Main Content"
-    )
+    claude_md.write_text("---\ncontext_files:\n  - src/**/*.py\n---\n\n# Main Content")
 
     ctx = ClaudeMdLoaderContext(temp_project)
 
@@ -1212,9 +1210,7 @@ def test_caching_different_context_files(temp_project: Path) -> None:
     ctx.load_claudemd(context_files=["src/main.py"])
 
     # Modify the file
-    claude_md.write_text(
-        "---\ncontext_files:\n  - src/**/*.py\n---\n\n# Modified"
-    )
+    claude_md.write_text("---\ncontext_files:\n  - src/**/*.py\n---\n\n# Modified")
 
     # Load with different context files (different cache key, should reload)
     result2 = ctx.load_claudemd(context_files=["src/utils.py"])
@@ -1547,18 +1543,22 @@ paths:
     ctx = ClaudeMdLoaderContext(temp_project)
 
     # Without matching context_files
-    chunks1 = list(ctx.load_claudemd_chunks(
-        context_files=["src/utils/helper.py"],
-        chunk_size=100,
-    ))
+    chunks1 = list(
+        ctx.load_claudemd_chunks(
+            context_files=["src/utils/helper.py"],
+            chunk_size=100,
+        )
+    )
     # Should only have main file chunks
     assert all("api-rules.md" not in chunk[0] for chunk in chunks1)
 
     # With matching context_files
-    chunks2 = list(ctx.load_claudemd_chunks(
-        context_files=["src/api/users.py"],
-        chunk_size=100,
-    ))
+    chunks2 = list(
+        ctx.load_claudemd_chunks(
+            context_files=["src/api/users.py"],
+            chunk_size=100,
+        )
+    )
     # Should include API rules chunks
     assert any("api-rules.md" in chunk[0] for chunk in chunks2)
 
@@ -1571,10 +1571,12 @@ def test_load_claudemd_chunks_with_extra_files(temp_project: Path) -> None:
     extra_file.write_text("Extra content")
 
     ctx = ClaudeMdLoaderContext(temp_project)
-    chunks = list(ctx.load_claudemd_chunks(
-        extra_claude_files=[str(extra_file)],
-        chunk_size=50,
-    ))
+    chunks = list(
+        ctx.load_claudemd_chunks(
+            extra_claude_files=[str(extra_file)],
+            chunk_size=50,
+        )
+    )
 
     # Should have chunks from both files
     file_paths = {chunk[0] for chunk in chunks}
@@ -1661,5 +1663,3 @@ def test_load_claudemd_chunks_tuple_structure(temp_project: Path) -> None:
         assert isinstance(end_line, int)
         assert start_line >= 1
         assert end_line >= start_line
-
-

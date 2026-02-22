@@ -24,14 +24,14 @@ def main() -> None:  # noqa: PLR0915
     start = time()
     result1 = ctx.load_claudemd(context_files=["src/claudemd_loader/ctx.py"])
     time1 = time() - start
-    print(f"First load:  {len(result1)} chars in {time1*1000:.2f}ms")
+    print(f"First load:  {len(result1)} chars in {time1 * 1000:.2f}ms")
 
     # Second load - will use cache (files haven't changed)
     start = time()
     result2 = ctx.load_claudemd(context_files=["src/claudemd_loader/ctx.py"])
     time2 = time() - start
-    print(f"Second load: {len(result2)} chars in {time2*1000:.2f}ms (cached)")
-    print(f"Speedup: {time1/time2:.1f}x faster")
+    print(f"Second load: {len(result2)} chars in {time2 * 1000:.2f}ms (cached)")
+    print(f"Speedup: {time1 / time2:.1f}x faster")
     print("\nNote: Cache automatically invalidates when files change!")
 
     # Example 2: Order independence
@@ -57,7 +57,7 @@ def main() -> None:  # noqa: PLR0915
     start = time()
     result5 = ctx.load_claudemd(context_files=["src/claudemd_loader/ctx.py"])
     time5 = time() - start
-    print(f"After invalidation: {len(result5)} chars in {time5*1000:.2f}ms")
+    print(f"After invalidation: {len(result5)} chars in {time5 * 1000:.2f}ms")
 
     # Example 4: Disabling cache
     print("\n4. Caching disabled:")
@@ -68,12 +68,12 @@ def main() -> None:  # noqa: PLR0915
     start = time()
     result6 = ctx_no_cache.load_claudemd(context_files=["src/claudemd_loader/ctx.py"])
     time6 = time() - start
-    print(f"First load:  {len(result6)} chars in {time6*1000:.2f}ms")
+    print(f"First load:  {len(result6)} chars in {time6 * 1000:.2f}ms")
 
     start = time()
     result7 = ctx_no_cache.load_claudemd(context_files=["src/claudemd_loader/ctx.py"])
     time7 = time() - start
-    print(f"Second load: {len(result7)} chars in {time7*1000:.2f}ms (no cache)")
+    print(f"Second load: {len(result7)} chars in {time7 * 1000:.2f}ms (no cache)")
     print("Note: Both loads read from disk (caching disabled)")
 
     # Example 5: Demonstrate automatic invalidation on file change

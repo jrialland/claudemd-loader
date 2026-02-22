@@ -59,7 +59,7 @@ def example_custom_recursion_depth() -> None:
         for i in range(num_levels):
             file_path = project_dir / f"level{i}.md"
             if i < num_levels - 1:
-                file_path.write_text(f"Level {i}\n\n@level{i+1}.md")
+                file_path.write_text(f"Level {i}\n\n@level{i + 1}.md")
             else:
                 file_path.write_text(f"Level {i} (deepest)")
 
@@ -131,11 +131,7 @@ End of main.
 """)
 
         # Use both custom filename and custom max depth
-        ctx = ClaudeMdLoaderContext(
-            project_dir,
-            claudemd_filename="MAIN.md",
-            max_recursion_depth=3
-        )
+        ctx = ClaudeMdLoaderContext(project_dir, claudemd_filename="MAIN.md", max_recursion_depth=3)
         content = ctx.load_claudemd()
 
         print("\nLoaded from MAIN.md with max_recursion_depth=3:")

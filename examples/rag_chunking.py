@@ -30,7 +30,7 @@ for i, (file_path, text, start_line, end_line) in enumerate(chunks_generator):
     filename = Path(file_path).name
     # Show first 50 chars of chunk...
     preview = text[:50].replace("\n", " ") + "..."
-    print(f"Chunk {i+1}: {filename} (lines {start_line}-{end_line})")
+    print(f"Chunk {i + 1}: {filename} (lines {start_line}-{end_line})")
     print(f"  Length: {len(text)} chars")
     print(f"  Content: {preview}")
     print()
@@ -50,10 +50,11 @@ print()
 overlapping_chunks = ctx.load_claudemd_chunks(chunk_size=200, chunk_overlap=50)
 
 for i, (file_path, text, start_line, end_line) in enumerate(overlapping_chunks):
-    if i >= 2: break
+    if i >= 2:
+        break
 
     filename = Path(file_path).name
-    print(f"Chunk {i+1}: {filename} (lines {start_line}-{end_line})")
+    print(f"Chunk {i + 1}: {filename} (lines {start_line}-{end_line})")
     print(f"  Start: {text[:20].replace(chr(10), ' ')}...")
     print(f"  End:   ...{text[-20:].replace(chr(10), ' ')}")
     print()
@@ -65,9 +66,8 @@ print()
 
 # Typically used when you want chunks relevant to specific source code
 # This filters which CLAUDE.md files are loaded based on their frontmatter
-chunks = list(ctx.load_claudemd_chunks(
-    context_files=["src/claudemd_loader/ctx.py"],
-    chunk_size=500
-))
+chunks = list(
+    ctx.load_claudemd_chunks(context_files=["src/claudemd_loader/ctx.py"], chunk_size=500)
+)
 
 print(f"Generated {len(chunks)} chunks for context: src/claudemd_loader/ctx.py")
