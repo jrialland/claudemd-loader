@@ -71,19 +71,18 @@ jobs:
   publish:
     needs: build
     name: Publish to PyPI
-    # Note: environment removed for initial release - add back after configuring trusted publishing on PyPI
-    # environment:
-    #   name: pypi
-    #   url: https://pypi.org/p/claudemd-loader
-    permissions:
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-      
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        merge-multiple: true
+    
+    - name: List distributions
+      run: ls -lh dist/
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_TOKEN }}
