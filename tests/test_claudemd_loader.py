@@ -637,8 +637,11 @@ def test_caching_with_extra_files(temp_project: Path) -> None:
     result2 = ctx.load_claudemd(extra_claude_files=[str(extra_file)])
     assert result1 == result2
 
-    # Different extra files (should not use cache)
+    # Modify extra file and force mtime change for cross-platform cache invalidation
     extra_file.write_text("# Modified Extra")
+    stat = extra_file.stat()
+    os.utime(extra_file, (stat.st_atime, stat.st_mtime + 2))
+
     result3 = ctx.load_claudemd(extra_claude_files=[str(extra_file)])
     assert "Modified Extra" in result3
 
