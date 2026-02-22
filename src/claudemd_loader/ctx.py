@@ -416,7 +416,7 @@ class ClaudeMdLoaderContext:
             with memory_path.open(encoding="utf-8") as f:
                 lines = []
                 for i, line in enumerate(f):
-                    if i >= 200:  # noqa: PLR2004
+                    if i >= 200:
                         break
                     lines.append(line.rstrip("\n\r"))
                 return "\n".join(lines)
