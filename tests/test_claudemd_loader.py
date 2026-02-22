@@ -16,6 +16,23 @@ def temp_project(tmp_path: Path) -> Path:
     return project_dir
 
 
+def write_file_with_mtime_update(file_path: Path, content: str) -> None:
+    """Write text to a file and force modification time update for cache testing.
+    
+    This ensures that the file's mtime changes even on systems with low timestamp
+    granularity (e.g., 1-second resolution on some Linux filesystems), which is
+    critical for cache invalidation tests.
+    
+    Args:
+        file_path: Path to the file to write
+        content: Text content to write
+    """
+    file_path.write_text(content)
+    stat = file_path.stat()
+    # Add 2 seconds to ensure mtime is detectably different
+    os.utime(file_path, (stat.st_atime, stat.st_mtime + 2))
+
+
 def test_basic_loading(temp_project: Path) -> None:
     """Test loading a simple CLAUDE.md file."""
     claude_md = temp_project / "CLAUDE.md"
@@ -637,10 +654,8 @@ def test_caching_with_extra_files(temp_project: Path) -> None:
     result2 = ctx.load_claudemd(extra_claude_files=[str(extra_file)])
     assert result1 == result2
 
-    # Modify extra file and force mtime change for cross-platform cache invalidation
-    extra_file.write_text("# Modified Extra")
-    stat = extra_file.stat()
-    os.utime(extra_file, (stat.st_atime, stat.st_mtime + 2))
+    # Modify extra file (guaranteed mtime change for cache invalidation)
+    write_file_with_mtime_update(extra_file, "# Modified Extra")
 
     result3 = ctx.load_claudemd(extra_claude_files=[str(extra_file)])
     assert "Modified Extra" in result3
@@ -1138,10 +1153,8 @@ def test_caching_enabled_by_default(temp_project: Path) -> None:
     result2 = ctx.load_claudemd()
     assert result2 == result1  # Exact same content from cache
 
-    # Modify the file and force mtime change for cross-platform cache invalidation
-    claude_md.write_text("# Modified Content")
-    stat = claude_md.stat()
-    os.utime(claude_md, (stat.st_atime, stat.st_mtime + 2))
+    # Modify the file (guaranteed mtime change for cache invalidation)
+    write_file_with_mtime_update(claude_md, "# Modified Content")
 
     # Third load should automatically detect file change and reload
     result3 = ctx.load_claudemd()
@@ -1310,10 +1323,8 @@ def test_cache_invalidates_on_imported_file_change(temp_project: Path) -> None:
     result2 = ctx.load_claudemd()
     assert result2 == result1
 
-    # Modify the imported file and force mtime change for cross-platform cache invalidation
-    readme.write_text("# Modified README")
-    stat = readme.stat()
-    os.utime(readme, (stat.st_atime, stat.st_mtime + 2))
+    # Modify the imported file (guaranteed mtime change for cache invalidation)
+    write_file_with_mtime_update(readme, "# Modified README")
 
     # Third load should detect the change and reload
     result3 = ctx.load_claudemd()
@@ -1345,10 +1356,8 @@ def test_cache_invalidates_on_memory_file_change(temp_project: Path) -> None:
         result2 = ctx.load_claudemd()
         assert result2 == result1
 
-        # Modify the memory file and force mtime change for cross-platform cache invalidation
-        memory_file.write_text("# Modified Memory")
-        stat = memory_file.stat()
-        os.utime(memory_file, (stat.st_atime, stat.st_mtime + 2))
+        # Modify the memory file (guaranteed mtime change for cache invalidation)
+        write_file_with_mtime_update(memory_file, "# Modified Memory")
 
         # Third load should detect the change and reload
         result3 = ctx.load_claudemd()
@@ -1408,8 +1417,8 @@ def test_cache_tracks_multiple_imported_files(temp_project: Path) -> None:
     result2 = ctx.load_claudemd()
     assert result2 == result1
 
-    # Modify just the middle file
-    (temp_project / "file2.md").write_text("# File 2 Modified")
+    # Modify just the middle file (guaranteed mtime change for cache invalidation)
+    write_file_with_mtime_update(temp_project / "file2.md", "# File 2 Modified")
 
     # Third load should detect the change
     result3 = ctx.load_claudemd()
